@@ -11,7 +11,7 @@ gate_checker = "DjEiZonFEZpw4M33ZCpMWnrshPwEJ5ZNmuV8FWQiVWdg"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "devnet"
 wallet = "/Users/es/.config/solana/id.json"
 
 [scripts]
