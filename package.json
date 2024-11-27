@@ -5,9 +5,14 @@
     "test": "ts-mocha -p ./tsconfig.json tests/*.spec.ts"
   },
   "dependencies": {
-    "@coral-xyz/anchor": "^0.29.0",
+    "@coral-xyz/anchor": "^0.28.0",
+    "@metaplex-foundation/mpl-token-metadata": "^3.3.0",
+    "@metaplex-foundation/umi": "^0.9.2",
+    "@metaplex-foundation/umi-bundle-defaults": "^0.9.2",
+    "@metaplex-foundation/umi-signer-wallet-adapters": "^0.9.2",
     "@project-serum/anchor": "^0.26.0",
-    "@solana/spl-token": "^0.4.9"
+    "@solana/spl-token": "^0.4.9",
+    "@solana/wallet-adapter-react": "^0.15.35"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.0",
