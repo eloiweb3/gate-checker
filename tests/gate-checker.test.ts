@@ -38,7 +38,7 @@ describe('NFT_mint', () => {
   const payer = program.provider.publicKey;
 
   const metadata = {
-    name: 'NuKIO token',
+    name: 'NUKIO token',
     symbol: 'NUKIO',
     uri: 'https://5vfxc4tr6xoy23qefqbj4qx2adzkzapneebanhcalf7myvn5gzja.arweave.net/7UtxcnH13Y1uBCwCnkL6APKsge0hAgacQFl-zFW9NlI',
     decimals: 9
@@ -62,7 +62,7 @@ describe('NFT_mint', () => {
     );
     return signature;
   };
-
+  const mintAuthority = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("authority")], program.programId)[0];
   it('Initialize Token', async () => {
     const info = await program.provider.connection.getAccountInfo(mint);
     if (info) {
@@ -74,13 +74,14 @@ describe('NFT_mint', () => {
       metadata: metadataAddress,
       mint,
       payer,
+      mintAuthority,
       rent: SYSVAR_RENT_PUBKEY,
       systemProgram: SystemProgram.programId,
       tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
       tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID
     };
 
-    const txHash = await program.methods.initToken(metadata).accounts(context).rpc();
+    const txHash = await program.methods.initNfts(metadata).accounts(context).rpc();
 
     await program.provider.connection.confirmTransaction(txHash); // Confirm the transaction
     log(txHash);
@@ -106,7 +107,7 @@ describe('NFT_mint', () => {
 
     const context = {
       mint,
-      destinationAta: destination,
+      destinationAtaV1: destination,
       payer,
       rent: SYSVAR_RENT_PUBKEY,
       systemProgram: SystemProgram.programId,
@@ -114,7 +115,7 @@ describe('NFT_mint', () => {
       associatedTokenProgram: anchor.utils.token.ASSOCIATED_PROGRAM_ID
     };
 
-    const txHash = await program.methods.mintTokens(new BN(mintAmount * 10 ** metadata.decimals)).accounts(context).rpc(); // Mint 5 tokens
+    const txHash = await program.methods.mintNfts(new BN(5)).accounts(context).rpc(); // Mint 5 tokens
     await program.provider.connection.confirmTransaction(txHash); // Confirm the transaction
     log(txHash);
 
