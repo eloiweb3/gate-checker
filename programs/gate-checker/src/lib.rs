@@ -10,10 +10,11 @@ use anchor_spl::{
     token::{ mint_to, transfer, Mint, MintTo, Token, TokenAccount,Transfer as SplTransfer },
 };
 
-declare_id!("32MZTSRGWxEkwG63qVuFwyTbpgEZXa5SxvBCVxCZTRY1");
+declare_id!("dc1WXfU4ZZt9aiskq4WXAm8p38FNWKxQgr9A7K2BkZH");
 
 #[program]
 mod gate_checker {
+
 
     use super::*;
     pub fn init_nfts(ctx: Context<InitToken>, metadata: InitTokenParams) -> Result<()> {
@@ -178,7 +179,43 @@ mod gate_checker {
         // )?;
         Ok(())
     }
+
+    pub fn transfer_token(ctx: Context<TransferToken>) -> Result<()> {
+        // Create the Transfer struct for our context
+        let transfer_instruction = SplTransfer{
+            from: ctx.accounts.from.to_account_info(),
+            to: ctx.accounts.to.to_account_info(),
+            authority: ctx.accounts.from_authority.to_account_info(),
+        };
+
+        let cpi_program = ctx.accounts.token_program.to_account_info();
+        // Create the Context for our Transfer request
+        let cpi_ctx = CpiContext::new(cpi_program, transfer_instruction);
+
+        // Execute anchor's helper function to transfer tokens
+     transfer(cpi_ctx, 1)?;
+
+        Ok(())
+    }
 }
+
+
+#[derive(Accounts)]
+pub struct TransferToken<'info> {
+    /// CHECK: The associated token account that we are transferring the token from
+    #[account(mut)]
+    pub from: UncheckedAccount<'info>,
+    /// CHECK: The associated token account that we are transferring the token to
+    #[account(mut)]
+    pub to: AccountInfo<'info>,
+    // the authority of the from account
+    pub from_authority: Signer<'info>,
+    pub token_program: Program<'info, Token>,
+}
+
+
+
+
 
 #[derive(Accounts)]
 #[instruction(params: InitTokenParams)]

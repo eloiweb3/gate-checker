@@ -1,3 +1,4 @@
+import { publicKey } from '@metaplex-foundation/umi';
 import * as anchor from '@coral-xyz/anchor';
 import { Program, BN } from '@coral-xyz/anchor';
 import {
@@ -13,8 +14,10 @@ import {
   MINT_SIZE,
   TOKEN_PROGRAM_ID,
   createAssociatedTokenAccountIdempotentInstruction,
+  createAssociatedTokenAccountInstruction,
   createInitializeMint2Instruction,
   createMintToInstruction,
+  getAssociatedTokenAddress,
   getAssociatedTokenAddressSync,
   getMinimumBalanceForRentExemptMint
 } from '@solana/spl-token';
@@ -38,10 +41,10 @@ describe('NFT_mint', () => {
   const payer = program.provider.publicKey;
 
   const metadata = {
-    name: 'NUKIO token',
-    symbol: 'NUKIO',
+    name: 'DUMESICA2 token',
+    symbol: 'DUMESICA2',
     uri: 'https://5vfxc4tr6xoy23qefqbj4qx2adzkzapneebanhcalf7myvn5gzja.arweave.net/7UtxcnH13Y1uBCwCnkL6APKsge0hAgacQFl-zFW9NlI',
-    decimals: 9
+    decimals: 0
   }; // Metadata for the NFT
 
   const mintAmount = 5;
@@ -62,7 +65,10 @@ describe('NFT_mint', () => {
     );
     return signature;
   };
-  const mintAuthority = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("authority")], program.programId)[0];
+  const mintAuthority = anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from('authority')],
+    program.programId
+  )[0];
   it('Initialize Token', async () => {
     const info = await program.provider.connection.getAccountInfo(mint);
     if (info) {
@@ -119,13 +125,67 @@ describe('NFT_mint', () => {
     await program.provider.connection.confirmTransaction(txHash); // Confirm the transaction
     log(txHash);
 
-    // const postBalance = (await program.provider.connection.getTokenAccountBalance(destination))
-    //   .value.uiAmount;
+    const postBalance = (await program.provider.connection.getTokenAccountBalance(destination))
+      .value.uiAmount;
 
-    // assert.equal(
-    //   initialBalance + mintAmount,
-    //   postBalance,
-    //   'Post balance should be equal initial plus mint aamount'
-    // );
+    assert.equal(
+      initialBalance + mintAmount,
+      postBalance,
+      'Post balance should be equal initial plus mint amount'
+    );
+  });
+
+  it('Transfer token', async () => {
+    const key = anchor.AnchorProvider.env().wallet.publicKey;
+    // Generate a random keypair that will represent our token
+
+    // const mintKey: anchor.web3.Keypair = anchor.web3.Keypair.generate();
+    let associatedTokenAccount = await getAssociatedTokenAddress(mint, key);
+    // Get anchor's wallet's public key
+    const myWallet = anchor.AnchorProvider.env().wallet.publicKey;
+    // Wallet that will receive the token
+    const toWallet: anchor.web3.Keypair = anchor.web3.Keypair.generate();
+    // The ATA for a token on the to wallet (but might not exist yet)
+    const toATA = await getAssociatedTokenAddress(mint, toWallet.publicKey);
+    // Fires a list of instructions
+    const mint_tx = new anchor.web3.Transaction().add(
+      // Create the ATA account that is associated with our To wallet
+      createAssociatedTokenAccountInstruction(
+        myWallet,
+        toATA,
+        toWallet.publicKey,
+        mint
+      )
+    );
+
+        console.log('MINTMINMINTINMINT' );
+    // Sends and create the transaction
+     const res = await anchor.AnchorProvider.env().sendAndConfirm(mint_tx, []);
+
+     console.log('resresresresresresresresres', res);
+
+    // Executes our transfer smart contract
+     const txHash =  await program.methods
+      .transferToken()
+      .accounts({
+        tokenProgram: TOKEN_PROGRAM_ID,
+        from: associatedTokenAccount,
+        fromAuthority: myWallet,
+        to: toATA
+      })
+      .rpc();
+
+      console.log('txHash', txHash);
+
+      //await program.provider.connection.confirmTransaction(txHash); // Confirm the transaction
+
+    // Get minted token amount on the ATA for our anchor wallet
+    const minted = (await program.provider.connection.getParsedAccountInfo(associatedTokenAccount))
+      .value
+
+      console.log('minted', minted);
+
+      //log(txHash);
+    // assert.equal(minted, 5);
   });
 });
