@@ -1,29 +1,17 @@
-import { publicKey } from '@metaplex-foundation/umi';
 import * as anchor from '@coral-xyz/anchor';
 import { Program, BN } from '@coral-xyz/anchor';
 import {
-  Keypair,
-  LAMPORTS_PER_SOL,
   PublicKey,
   SystemProgram,
   SYSVAR_RENT_PUBKEY,
-  Transaction
 } from '@solana/web3.js';
 import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  MINT_SIZE,
   TOKEN_PROGRAM_ID,
-  createAssociatedTokenAccountIdempotentInstruction,
   createAssociatedTokenAccountInstruction,
-  createInitializeMint2Instruction,
-  createMintToInstruction,
   getAssociatedTokenAddress,
-  getAssociatedTokenAddressSync,
-  getMinimumBalanceForRentExemptMint
 } from '@solana/spl-token';
 
 import { GateChecker } from '../target/types/gate_checker';
-import { token } from '@coral-xyz/anchor/dist/cjs/utils';
 import { assert } from 'chai';
 
 describe('NFT_mint', () => {
@@ -37,13 +25,13 @@ describe('NFT_mint', () => {
 
   const METADATA_SEED = 'metadata'; // Seed for the metadata account
   const TOKEN_METADATA_PROGRAM_ID = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
-  const MINT_SEED = 'mint';
+  const MINT_SEED = 'mintTurbin3';
   const payer = program.provider.publicKey;
 
   const metadata = {
-    name: 'DUMESICA2 token',
-    symbol: 'DUMESICA2',
-    uri: 'https://5vfxc4tr6xoy23qefqbj4qx2adzkzapneebanhcalf7myvn5gzja.arweave.net/7UtxcnH13Y1uBCwCnkL6APKsge0hAgacQFl-zFW9NlI',
+    name: 'Turbin3 token_',
+    symbol: 'TRB',
+    uri: "https://raw.githubusercontent.com/eloiweb3/gate-checker/refs/heads/main/assets/nft-metadata.json",
     decimals: 0
   }; // Metadata for the NFT
 
@@ -69,6 +57,7 @@ describe('NFT_mint', () => {
     [Buffer.from('authority')],
     program.programId
   )[0];
+
   it('Initialize Token', async () => {
     const info = await program.provider.connection.getAccountInfo(mint);
     if (info) {
@@ -138,54 +127,150 @@ describe('NFT_mint', () => {
   it('Transfer token', async () => {
     const key = anchor.AnchorProvider.env().wallet.publicKey;
     // Generate a random keypair that will represent our token
-
+    console.log('key', key);
     // const mintKey: anchor.web3.Keypair = anchor.web3.Keypair.generate();
-    let associatedTokenAccount = await getAssociatedTokenAddress(mint, key);
+    let associatedTokenAccount1 = await getAssociatedTokenAddress(mint, key);
+    // let associatedTokenAccount2 = await getAssociatedTokenAddress(mint, key);
+    // let associatedTokenAccount3 = await getAssociatedTokenAddress(mint, key);
+    // let associatedTokenAccount4 = await getAssociatedTokenAddress(mint, key);
+    // let associatedTokenAccount5 = await getAssociatedTokenAddress(mint, key);
     // Get anchor's wallet's public key
-    const myWallet = anchor.AnchorProvider.env().wallet.publicKey;
+    // const myWallet = anchor.AnchorProvider.env().wallet.publicKey;
     // Wallet that will receive the token
-    const toWallet: anchor.web3.Keypair = anchor.web3.Keypair.generate();
+    const toWallet1: anchor.web3.Keypair = anchor.web3.Keypair.generate();
+    const toWallet2: anchor.web3.Keypair = anchor.web3.Keypair.generate();
+    const toWallet3: anchor.web3.Keypair = anchor.web3.Keypair.generate();
+    const toWallet4: anchor.web3.Keypair = anchor.web3.Keypair.generate();
+    const toWallet5: anchor.web3.Keypair = anchor.web3.Keypair.generate();
     // The ATA for a token on the to wallet (but might not exist yet)
-    const toATA = await getAssociatedTokenAddress(mint, toWallet.publicKey);
+    const toATA1 = await getAssociatedTokenAddress(mint, toWallet1.publicKey);
+    const toATA2 = await getAssociatedTokenAddress(mint, toWallet2.publicKey);
+    const toATA3 = await getAssociatedTokenAddress(mint, toWallet3.publicKey);
+    const toATA4 = await getAssociatedTokenAddress(mint, toWallet4.publicKey);
+    const toATA5 = await getAssociatedTokenAddress(mint, toWallet5.publicKey);
     // Fires a list of instructions
-    const mint_tx = new anchor.web3.Transaction().add(
+    const mint_tx1 = new anchor.web3.Transaction().add(
       // Create the ATA account that is associated with our To wallet
       createAssociatedTokenAccountInstruction(
-        myWallet,
-        toATA,
-        toWallet.publicKey,
+        key,
+        toATA1,
+        toWallet1.publicKey,
+        mint
+      )
+    );
+    const mint_tx2 = new anchor.web3.Transaction().add(
+      // Create the ATA account that is associated with our To wallet
+      createAssociatedTokenAccountInstruction(
+        key,
+        toATA2,
+        toWallet2.publicKey,
+        mint
+      )
+    );
+    const mint_tx3 = new anchor.web3.Transaction().add(
+      // Create the ATA account that is associated with our To wallet
+      createAssociatedTokenAccountInstruction(
+        key,
+        toATA3,
+        toWallet3.publicKey,
+        mint
+      )
+    );
+    const mint_tx4 = new anchor.web3.Transaction().add(
+      // Create the ATA account that is associated with our To wallet
+      createAssociatedTokenAccountInstruction(
+        key,
+        toATA4,
+        toWallet4.publicKey,
+        mint
+      )
+    );
+    const mint_tx5 = new anchor.web3.Transaction().add(
+      // Create the ATA account that is associated with our To wallet
+      createAssociatedTokenAccountInstruction(
+        key,
+        toATA5,
+        toWallet5.publicKey,
         mint
       )
     );
 
-        console.log('MINTMINMINTINMINT' );
     // Sends and create the transaction
-     const res = await anchor.AnchorProvider.env().sendAndConfirm(mint_tx, []);
+     const res1 = await anchor.AnchorProvider.env().sendAndConfirm(mint_tx1, []);
+     const res2 = await anchor.AnchorProvider.env().sendAndConfirm(mint_tx2, []);
+     const res3 = await anchor.AnchorProvider.env().sendAndConfirm(mint_tx3, []);
+     const res4 = await anchor.AnchorProvider.env().sendAndConfirm(mint_tx4, []);
+     const res5 = await anchor.AnchorProvider.env().sendAndConfirm(mint_tx5, []);
 
-     console.log('resresresresresresresresres', res);
+     console.log('res1', res1);
+     console.log('res2', res2);
+     console.log('res3', res3);
+     console.log('res4', res4);
+     console.log('res5', res5);
+
 
     // Executes our transfer smart contract
-     const txHash =  await program.methods
+     const txHash1 =  await program.methods
       .transferToken()
       .accounts({
         tokenProgram: TOKEN_PROGRAM_ID,
-        from: associatedTokenAccount,
-        fromAuthority: myWallet,
-        to: toATA
+        from: associatedTokenAccount1,
+        fromAuthority: key,
+        to: toATA1
+      })
+      .rpc();
+     const txHash2 =  await program.methods
+      .transferToken()
+      .accounts({
+        tokenProgram: TOKEN_PROGRAM_ID,
+        from: associatedTokenAccount1,
+        fromAuthority: key,
+        to: toATA2
+      })
+      .rpc();
+     const txHash3 =  await program.methods
+      .transferToken()
+      .accounts({
+        tokenProgram: TOKEN_PROGRAM_ID,
+        from: associatedTokenAccount1,
+        fromAuthority: key,
+        to: toATA3
+      })
+      .rpc();
+     const txHash4 =  await program.methods
+      .transferToken()
+      .accounts({
+        tokenProgram: TOKEN_PROGRAM_ID,
+        from: associatedTokenAccount1,
+        fromAuthority: key,
+        to: toATA4
+      })
+      .rpc();
+     const txHash5 =  await program.methods
+      .transferToken()
+      .accounts({
+        tokenProgram: TOKEN_PROGRAM_ID,
+        from: associatedTokenAccount1,
+        fromAuthority: key,
+        to: toATA5
       })
       .rpc();
 
-      console.log('txHash', txHash);
+      console.log('txHash1', txHash1);
+      console.log('txHash2', txHash2);
+      console.log('txHash3', txHash3);
+      console.log('txHash4', txHash4);
+      console.log('txHash5', txHash5);
 
-      //await program.provider.connection.confirmTransaction(txHash); // Confirm the transaction
+      await program.provider.connection.confirmTransaction(txHash1); // Confirm the transaction
 
     // Get minted token amount on the ATA for our anchor wallet
-    const minted = (await program.provider.connection.getParsedAccountInfo(associatedTokenAccount))
+    const minted = (await program.provider.connection.getParsedAccountInfo(associatedTokenAccount1))
       .value
 
       console.log('minted', minted);
 
       //log(txHash);
-    // assert.equal(minted, 5);
+    // assert.equal(minted, 0, 'Minted should be 0');
   });
 });
